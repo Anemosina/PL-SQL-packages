@@ -1,0 +1,29 @@
+create or replace package body DB_PACKET_NAME is
+
+PROCEDURE MAIL_SUBJECT IS
+vreportbody  varchar2(4000);
+
+BEGIN
+vreportbody:='Hi, please check'||UTL_TCP.CRLF;
+
+FOR tt IN (
+
+SELECT * FROM table1 i 
+WHERE i.test_column NOT IN (SELECT test_column FROM table12)
+
+)
+
+LOOP
+  
+    vreportbody:=vreportbody||UTL_TCP.CRLF||tt.id||'|'||tt.test_column||'|'||tt.teble_column||'|'||tt.teble_column2||'|'||tt.teble_column3;
+   
+    END LOOP;
+    IF LENGTH(vreportbody)>19
+    THEN
+
+           mon_send_mail_single_clob(msg_to => 'email@mail.com',msg_from => 'name_mail@mailcom',msg_subject => 'MAIL_SUBJECT',msg_text => vreportbody);
+
+ END IF;
+    END;
+
+end PACKET_NAME;
