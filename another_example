@@ -1,0 +1,33 @@
+vreportbody  varchar2(4000);
+a_count INTEGER;
+
+BEGIN
+vreportbody:='Hi, please check'||UTL_TCP.CRLF;
+a_count := 0;
+
+FOR tt IN 
+  (
+    SELECT count(*) cnt, 'Total > 15min' time FROM table1 j
+    WHERE j.number NOT IN ('1','11')
+      AND j.number > 0 
+    UNION ALL
+    SELECT count(*), 'Total > 30min' FROM table1 j
+    WHERE j.number NOT IN ('1','11') 
+      AND j.number > 0 
+    UNION ALL
+    SELECT count(*), 'Total > 60min' FROM table1 j
+    WHERE j.number NOT IN ('1','11') 
+    AND j.number > 0 
+  )
+LOOP
+  vreportbody:=vreportbody||UTL_TCP.CRLF||tt.test_column||'|'||tt.test_column2;
+  a_count:=a_count+tt.cnt;
+END LOOP;
+
+    IF a_count>0
+    THEN
+       mon_send_mail_single_clob(msg_to => 'email@mail.com',msg_from => 'name_mail@mailcom',msg_subject => 'MAIL_SUBJECT',msg_text => vreportbody);
+    END IF;
+END;
+
+end PACKET_NAME;
